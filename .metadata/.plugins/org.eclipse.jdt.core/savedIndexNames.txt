@@ -1,0 +1,19 @@
+INDEX VERSION 1.134+F:\SA\OSGI MY Part\OSGI\.metadata\.plugins\org.eclipse.jdt.core
+1383582343.index
+1246839572.index
+552031455.index
+3193546827.index
+4278635145.index
+1555751241.index
+2107731039.index
+4054787085.index
+1865797976.index
+1243372115.index
+643209697.index
+697398408.index
+1167070096.index
+3413270776.index
+847656006.index
+759722727.index
+3765166718.index
+3126600637.index

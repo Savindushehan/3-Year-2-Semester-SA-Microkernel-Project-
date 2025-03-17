@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<section name="Workbench">
+	<item key="hasShownOverlayPopupBefore" value="true"/>
+	<section name="java.lang.Class">
+		<item key="selection" value="InventoryServiceConsumer"/>
+		<item key="wrap" value="true"/>
+		<item key="casesensitive" value="false"/>
+		<item key="wholeword" value="false"/>
+		<item key="incremental" value="false"/>
+		<item key="isRegEx" value="false"/>
+		<item key="replaceBarOpen" value="false"/>
+		<list key="findhistory">
+			<item value="InventoryServiceConsumer"/>
+			<item value="conn"/>
+			<item value="InventoryServicePublisher"/>
+			<item value="StockServicePublisher"/>
+			<item value="HopitalCoreDatabase"/>
+			<item value="HospitalCoreDatabase_1.0.0.qualifier"/>
+			<item value="Id: 2"/>
+			<item value="StockService is not available."/>
+			<item value="Bundle-ActivationPolicy: lazy"/>
+		</list>
+		<list key="replacehistory">
+		</list>
+	</section>
+	<section name="org.eclipse.ui.texteditor.FindReplaceDialog_dialogBounds">
+		<item key="DIALOG_X_ORIGIN" value="852"/>
+		<item key="DIALOG_Y_ORIGIN" value="174"/>
+		<item key="DIALOG_WIDTH" value="322"/>
+		<item key="DIALOG_HEIGHT" value="392"/>
+		<item key="DIALOG_FONT_NAME" value="1|Segoe UI|9.0|0|WINDOWS|1|-12|0|0|0|400|0|0|0|1|0|0|0|0|Segoe UI"/>
+	</section>
+</section>

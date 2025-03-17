@@ -1,0 +1,177 @@
+package supplierserviceconsumer;
+
+import org.osgi.framework.BundleActivator;
+import org.osgi.framework.BundleContext;
+import org.osgi.framework.ServiceReference;
+import org.eclipse.swt.SWT;
+import org.eclipse.swt.custom.CTabFolder;
+import org.eclipse.swt.custom.CTabItem;
+import org.eclipse.swt.events.SelectionAdapter;
+import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.layout.GridData;
+import org.eclipse.swt.layout.GridLayout;
+import org.eclipse.swt.widgets.*;
+
+import supplierservicepublisher.Supplier;
+import supplierservicepublisher.SupplierService;
+
+import java.util.List;
+
+public class Activator implements BundleActivator {
+    private ServiceReference<?> supplierServiceRef;
+    private Display display;
+    private Shell shell;
+    private SupplierService supplierService;
+    private Table supplierTable;
+
+    public void start(BundleContext context) throws Exception {
+        supplierServiceRef = context.getServiceReference(SupplierService.class.getName());
+        supplierService = (SupplierService) context.getService(supplierServiceRef);
+
+        if (supplierService == null) {
+            System.err.println("SupplierService is not available. Please ensure the service is running.");
+            return;
+        }
+
+        display = new Display();
+        shell = new Shell(display);
+        shell.setText("Supplier Management System");
+        shell.setSize(900, 600);
+        shell.setLayout(new GridLayout(1, false));
+
+        CTabFolder tabFolder = new CTabFolder(shell, SWT.BORDER);
+        CTabItem supplierTab = new CTabItem(tabFolder, SWT.NONE);
+        supplierTab.setText("Supplier Management");
+        Composite supplierComposite = createSupplierTabContent(tabFolder);
+        supplierTab.setControl(supplierComposite);
+        tabFolder.setSelection(0);
+
+        shell.open();
+
+        while (!shell.isDisposed()) {
+            if (!display.readAndDispatch()) {
+                display.sleep();
+            }
+        }
+        display.dispose();
+    }
+
+    private Composite createSupplierTabContent(CTabFolder parent) {
+        Composite composite = new Composite(parent, SWT.NONE);
+        composite.setLayout(new GridLayout(1, false));
+
+        supplierTable = new Table(composite, SWT.BORDER | SWT.FULL_SELECTION);
+        supplierTable.setHeaderVisible(true);
+        supplierTable.setLinesVisible(true);
+        supplierTable.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
+
+        String[] titles = {"Supplier ID", "Supplier Code", "Supplier Name", "Phone", "Address", "Company ID"};
+        for (String title : titles) {
+            TableColumn column = new TableColumn(supplierTable, SWT.NONE);
+            column.setText(title);
+            column.setWidth(130);
+        }
+
+        Button refreshButton = new Button(composite, SWT.PUSH);
+        refreshButton.setText("Refresh List");
+        refreshButton.addSelectionListener(new SelectionAdapter() {
+            @Override
+            public void widgetSelected(SelectionEvent e) {
+                refreshSupplierList();
+            }
+        });
+        Button addSupplierButton = new Button(composite, SWT.PUSH);
+        addSupplierButton.setText("Add New Supplier");
+        addSupplierButton.addSelectionListener(new SelectionAdapter() {
+            @Override
+            public void widgetSelected(SelectionEvent e) {
+                openAddSupplierDialog();
+            }
+        });
+        return composite;
+    }
+
+    private void openAddSupplierDialog() {
+        Shell dialogShell = new Shell(shell, SWT.DIALOG_TRIM | SWT.APPLICATION_MODAL);
+        dialogShell.setText("Add New Supplier");
+        dialogShell.setLayout(new GridLayout(2, false));
+
+        createLabel(dialogShell, "Supplier Code:");
+        Text codeText = new Text(dialogShell, SWT.BORDER);
+
+        createLabel(dialogShell, "Supplier Name:");
+        Text nameText = new Text(dialogShell, SWT.BORDER);
+
+        createLabel(dialogShell, "Phone:");
+        Text phoneText = new Text(dialogShell, SWT.BORDER);
+
+        createLabel(dialogShell, "Address:");
+        Text addressText = new Text(dialogShell, SWT.BORDER);
+
+        createLabel(dialogShell, "Company ID:");
+        Text companyIdText = new Text(dialogShell, SWT.BORDER);
+
+        Button saveButton = new Button(dialogShell, SWT.PUSH);
+        saveButton.setText("Save");
+        saveButton.addSelectionListener(new SelectionAdapter() {
+            @Override
+            public void widgetSelected(SelectionEvent e) {
+                try {
+                    Supplier newSupplier = new Supplier(
+                    		codeText.toString(),nameText.toString(),phoneText.toString(),addressText.toString(),companyIdText.toString()
+                    		
+                    );
+                    if (supplierService.addsupplier(newSupplier)) {
+                        refreshSupplierList();
+                        dialogShell.close();
+                    } else {
+                        System.err.println("Failed to add supplier.");
+                    }
+                } catch (Exception ex) {
+                    System.err.println("Error adding supplier: " + ex.getMessage());
+                }
+            }
+        });
+
+        Button cancelButton = new Button(dialogShell, SWT.PUSH);
+        cancelButton.setText("Cancel");
+        cancelButton.addSelectionListener(e -> dialogShell.close());
+
+        dialogShell.pack();
+        dialogShell.open();
+
+        while (!dialogShell.isDisposed()) {
+            if (!display.readAndDispatch()) {
+                display.sleep();
+            }
+        }
+    }
+
+    private Label createLabel(Composite parent, String text) {
+        Label label = new Label(parent, SWT.NONE);
+        label.setText(text);
+        return label;
+    }
+
+    private void refreshSupplierList() {
+        if (supplierService == null) return;
+        supplierTable.removeAll();
+        List<Supplier> suppliers = supplierService.getAllSuppliers();
+        for (Supplier supplier : suppliers) {
+            TableItem item = new TableItem(supplierTable, SWT.NONE);
+            item.setText(new String[]{
+                String.valueOf(supplier.getSupplierId()),
+                supplier.getSupplierCode(),
+                supplier.getSupplierName(),
+                supplier.getPhone(),
+                supplier.getAddress(),
+                String.valueOf(supplier.getCompanyId())
+            });
+        }
+    }
+
+    @Override
+    public void stop(BundleContext bundleContext) throws Exception {
+        bundleContext.ungetService(supplierServiceRef);
+    }
+}
